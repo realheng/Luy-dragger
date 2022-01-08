@@ -171,6 +171,7 @@ class Dragger extends React.Component {
      * 如果绑定在元素上，则鼠标离开元素，就不会再被监听了
      */
     // 学到了，放在doc上面就依然可以监听到，绝了~
+    // 不过貌似react的事件全部都是放在document上面的，所以这么做的意义好像不是很大
     doc.addEventListener('mousemove', this.move)
     doc.addEventListener('mouseup', this.onDragEnd)
 
@@ -254,6 +255,8 @@ class Dragger extends React.Component {
     }
   }
 
+  // 这里是连接器
+  // dom元素接受这些参数绑定事件
   getHandle = () => {
     // 把PC端和移动的处理函数全部封装起来了
     // 这样就不用单独处理兼容性问题了

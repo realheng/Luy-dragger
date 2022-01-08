@@ -32,11 +32,6 @@ class C extends React.Component {
           data={Data}
           gap={this.state.gap}
           renderItem={(handle, data) => {
-            console.log(
-              '%c 「index.js」-「35」-「handle」: ',
-              'font-size:13px; background:#e6f7ff; color:#118aff;',
-              handle()
-            )
             return (
               <div className="props-draggers" {...handle()}>
                 {data.name}

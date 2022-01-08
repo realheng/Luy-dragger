@@ -54,78 +54,82 @@ export default class SortList extends React.Component {
     this.currentY = y
 
     const fixedDirection = this.props.horizontal ? x : y
-
     const o = clamp(fixedDirection / this.getGap(preOrder.o))
+    // preOrder.o 是元素之前的位置
+    // o是元素现在计算出来的位置
     const max = this.state.order.length - 1
     const newOrder = this.state.order.map(od => {
+      // 如果元素od的位置和计算出来的位置一样
+      // 那么将od的位置和当前拖拽元素的位置进行交换
       if (o === od.o) {
         return { ...od, o: preOrder.o }
       }
+      // 如果遍历到当前拖拽元素
+      // 那么将当前拖拽元素的位置设置为o
+      // 这个算法并没有真正改变order的顺序
+      // 只是改变了transfromX的值，感觉这样不是很好啊！
       if (preOrder.o === od.o) {
         return { ...od, o: between(o, 0, max) }
       }
       return od
     })
 
-    console.log(fixedDirection)
+    // 看不懂想干啥 先注释掉
+    // if (this.container.scrollTop + 300 - y < 100 && this.timer === -1) {
+    //   /**
+    //    * 当有已经有滚动的时候，我们需要减去自动滚动前的 scrolltop
+    //    */
+    //   const currentScrollTop = this.container.scrollTop
+    //   const scrollOffsetY = event.clientY / 80
 
-    if (this.container.scrollTop + 300 - y < 100 && this.timer === -1) {
-      /**
-       * 当有已经有滚动的时候，我们需要减去自动滚动前的 scrolltop
-       */
-      const currentScrollTop = this.container.scrollTop
-      const scrollOffsetY = event.clientY / 80
+    //   this.timer = setInterval(() => {
+    //     const max = this.state.order.length - 1
+    //     if (this.state.currentOrder >= max) {
+    //       return
+    //     }
 
-      this.timer = setInterval(() => {
-        const max = this.state.order.length - 1
-        if (this.state.currentOrder >= max) {
-          return
-        }
+    //     const nextY =
+    //       this.currentY + this.container.scrollTop - currentScrollTop
 
-        const nextY =
-          this.currentY + this.container.scrollTop - currentScrollTop
+    //     //自动滚动
+    //     this.manager[preOrder.name].autoMove(this.currentX, nextY)
+    //     //设置滚动
+    //     this.container.scrollTop += scrollOffsetY
 
-        //自动滚动
-        this.manager[preOrder.name].autoMove(this.currentX, nextY)
-        //设置滚动
-        this.container.scrollTop += scrollOffsetY
+    //     const o = clamp(nextY / this.getGap(preOrder.o))
 
-        // console.log(y + this.container.scrollTop);
+    //     const newOrder = this.state.order.map(od => {
+    //       if (preOrder.name === od.name) {
+    //         return { ...od, o: o }
+    //       }
+    //       if (preOrder.name !== od.name && o === od.o) {
+    //         return { ...od, o: between(o - 1, 0, max) }
+    //       }
+    //       return od
+    //     })
 
-        const o = clamp(nextY / this.getGap(preOrder.o))
+    //     this.setState({
+    //       currentOrder: o,
+    //       order: newOrder,
+    //       autoScrolling: true
+    //     })
 
-        // console.log(this.manager[preOrder.name]);
+    //     if (
+    //       nextY - this.container.scrollTop < 150 &&
+    //       this.state.autoScrolling
+    //     ) {
+    //       clearInterval(this.timer)
 
-        const newOrder = this.state.order.map(od => {
-          if (preOrder.name === od.name) {
-            return { ...od, o: o }
-          }
-          if (preOrder.name !== od.name && o === od.o) {
-            return { ...od, o: between(o - 1, 0, max) }
-          }
-          return od
-        })
+    //       this.timer = -1
+    //       this.setState({
+    //         autoScrolling: false
+    //       })
+    //     }
+    //   }, 5)
+    // }
 
-        this.setState({
-          currentOrder: o,
-          order: newOrder,
-          autoScrolling: true
-        })
-
-        if (
-          nextY - this.container.scrollTop < 150 &&
-          this.state.autoScrolling
-        ) {
-          clearInterval(this.timer)
-
-          this.timer = -1
-          this.setState({
-            autoScrolling: false
-          })
-        }
-      }, 5)
-    }
-
+    // 拖拽的时候交换位置
+    // 设置现在正在拖拽的元素order
     if (!this.state.autoScrolling) {
       this.setState({
         currentOrder: preOrder.o,
@@ -157,16 +161,6 @@ export default class SortList extends React.Component {
           {this.state.order.map(order => {
             //获取当前的实际位置
             const delta = order.o * this.getGap(order.o)
-            console.log(
-              '%c 「list.js」-「160」-「order」: ',
-              'font-size:13px; background:#e6f7ff; color:#118aff;',
-              order
-            )
-            console.log(
-              '%c 「list.js」-「160」-「delta」: ',
-              'font-size:13px; background:#e6f7ff; color:#118aff;',
-              delta
-            )
             return (
               <Dragger
                 ref={node => (this.manager[order.name] = node)}
@@ -179,12 +173,6 @@ export default class SortList extends React.Component {
                 onDragEnd={this.dragEnd}
               >
                 {({ style, handle, dragging }) => {
-                  console.log(
-                    '%c 「list.js」-「182」-「style」: ',
-                    'font-size:13px; background:#e6f7ff; color:#118aff;',
-                    style,
-                    delta
-                  )
                   return (
                     <div
                       style={{
