@@ -11,7 +11,6 @@ export default class LayoutDemo extends React.Component {
 
   render() {
     const name = 'props-draggers'
-
     return (
       <div>
         <Dragger
