@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from 'react'
+import PropTypes from 'prop-types'
 import {
   int,
   innerHeight,
@@ -7,14 +7,14 @@ import {
   outerHeight,
   outerWidth,
   parseBounds,
-  isNumber
-} from './utils';
+  isNumber,
+} from './utils'
 
-import classNames from 'classnames';
+import classNames from 'classnames'
 
-const doc = document;
+const doc = document
 
-const noop = (x, y) => {};
+const noop = (x, y) => {}
 
 class Dragger extends React.Component {
   /**
@@ -25,14 +25,14 @@ class Dragger extends React.Component {
     allowY: true,
     x: void 666,
     y: void 666,
-    onDragging: noop
-  };
+    onDragging: noop,
+  }
 
   shouldComponentUpdate(nextProps, nextState) {
     return (
       nextState !== this.state ||
       JSON.stringify(nextProps) !== JSON.stringify(this.props)
-    );
+    )
   }
 
   state = {
@@ -47,53 +47,53 @@ class Dragger extends React.Component {
     lastX: 0,
     lastY: 0,
     dragging: false,
-    mouseInTarget: 0
-  };
+    mouseInTarget: 0,
+  }
 
-  getParent = node => {
-    this.parent = node;
-  };
+  getParent = (node) => {
+    this.parent = node
+  }
 
   autoMove = (x, y) => {
     this.setState({
       x: x,
-      y: y
-    });
-  };
+      y: y,
+    })
+  }
 
-  move = event => {
+  move = (event) => {
     /** 保证用户在移动元素的时候不会选择到元素内部的东西 */
-    doc.body.style.userSelect = 'none';
+    doc.body.style.userSelect = 'none'
 
-    let { lastX, lastY } = this.state;
+    let { lastX, lastY } = this.state
 
     /*  event.client - this.state.origin 表示的是移动的距离,
-    *   elX表示的是原来已经有的位移
-    */
-    let deltaX = event.clientX - this.state.originX + lastX;
-    let deltaY = event.clientY - this.state.originY + lastY;
+     *   elX表示的是原来已经有的位移
+     */
+    let deltaX = event.clientX - this.state.originX + lastX
+    let deltaY = event.clientY - this.state.originY + lastY
 
     if (event.type === 'touchmove') {
-      deltaX = event.touches[0].clientX - this.state.originX + lastX;
-      deltaY = event.touches[0].clientY - this.state.originY + lastY;
+      deltaX = event.touches[0].clientX - this.state.originX + lastX
+      deltaY = event.touches[0].clientY - this.state.originY + lastY
     }
 
     /**
      * 网格式移动范围设定，永远移动 n 的倍数
      * 注意:设定移动范围的时候，一定要在判断bounds之前，否则会造成bounds不对齐
      */
-    const { grid } = this.props;
+    const { grid } = this.props
     if (Array.isArray(grid) && grid.length === 2) {
-      deltaX = Math.round(deltaX / grid[0]) * grid[0];
-      deltaY = Math.round(deltaY / grid[1]) * grid[1];
+      deltaX = Math.round(deltaX / grid[0]) * grid[0]
+      deltaY = Math.round(deltaY / grid[1]) * grid[1]
     }
 
-    const { bounds } = this.props;
+    const { bounds } = this.props
     if (bounds) {
       /**
        * 如果用户指定一个边界，那么在这里处理
        */
-      let NewBounds = bounds === true ? bounds : parseBounds(bounds);
+      let NewBounds = bounds === true ? bounds : parseBounds(bounds)
 
       if (this.parent) {
         NewBounds = {
@@ -118,47 +118,47 @@ class Dragger extends React.Component {
             outerHeight(this.self) -
             this.self.offsetTop +
             int(this.parent.style.paddingBottom) -
-            int(this.self.style.marginBottom)
-        };
+            int(this.self.style.marginBottom),
+        }
       }
 
       /**
        * 保证不超出右边界和底部
        *
        */
-      if (isNumber(NewBounds.right)) deltaX = Math.min(deltaX, NewBounds.right);
+      if (isNumber(NewBounds.right)) deltaX = Math.min(deltaX, NewBounds.right)
       if (isNumber(NewBounds.bottom))
-        deltaY = Math.min(deltaY, NewBounds.bottom);
+        deltaY = Math.min(deltaY, NewBounds.bottom)
 
       /**
        * 保证不超出左边和上边
        *
        */
-      if (isNumber(NewBounds.left)) deltaX = Math.max(deltaX, NewBounds.left);
-      if (isNumber(NewBounds.top)) deltaY = Math.max(deltaY, NewBounds.top);
+      if (isNumber(NewBounds.left)) deltaX = Math.max(deltaX, NewBounds.left)
+      if (isNumber(NewBounds.top)) deltaY = Math.max(deltaY, NewBounds.top)
     }
 
     /**如果设置了x,y限制 */
-    deltaX = this.props.allowX ? deltaX : 0;
-    deltaY = this.props.allowY ? deltaY : 0;
+    deltaX = this.props.allowX ? deltaX : 0
+    deltaY = this.props.allowY ? deltaY : 0
 
     /**移动时回调，用于外部控制 */
-    this.props.onDragMove && this.props.onDragMove(event, deltaX, deltaY);
-    this.props.onDragging(this.state.x, this.state.y);
+    this.props.onDragMove && this.props.onDragMove(event, deltaX, deltaY)
+    this.props.onDragging(this.state.x, this.state.y)
 
     const ofy =
       event.clientY +
       this.props.parent().scrollTop -
-      this.props.parent().getBoundingClientRect().top;
+      this.props.parent().getBoundingClientRect().top
 
     this.setState({
       x: deltaX,
-      y: ofy - this.state.mouseInTarget
-    });
-  };
+      y: ofy - this.state.mouseInTarget,
+    })
+  }
 
-  onDragStart = event => {
-    if (this.props.static === true) return;
+  onDragStart = (event) => {
+    if (this.props.static === true) return
 
     /**
      * 把监听事件的回掉函数，绑定在document上
@@ -166,30 +166,30 @@ class Dragger extends React.Component {
      * 绑定在document上可以使得其依旧能够监听
      * 如果绑定在元素上，则鼠标离开元素，就不会再被监听了
      */
-    doc.addEventListener('mousemove', this.move);
-    doc.addEventListener('mouseup', this.onDragEnd);
+    doc.addEventListener('mousemove', this.move)
+    doc.addEventListener('mouseup', this.onDragEnd)
 
-    doc.addEventListener('touchmove', this.move);
-    doc.addEventListener('touchend', this.onDragEnd);
+    doc.addEventListener('touchmove', this.move)
+    doc.addEventListener('touchend', this.onDragEnd)
 
     if (this.parent) {
       /**
        * 我们自己
        */
-      this.self = event.currentTarget;
+      this.self = event.currentTarget
     }
 
     this.props.onDragStart &&
-      this.props.onDragStart(event, this.state.x, this.state.y);
+      this.props.onDragStart(event, this.state.x, this.state.y)
 
-    this.props.onDragging(this.state.x, this.state.y);
+    this.props.onDragging(this.state.x, this.state.y)
 
-    let deltaX = event.clientX;
-    let deltaY = event.clientY;
+    let deltaX = event.clientX
+    let deltaY = event.clientY
 
     if (event.type === 'touchstart') {
-      deltaX = event.touches[0].clientX;
-      deltaY = event.touches[0].clientY;
+      deltaX = event.touches[0].clientX
+      deltaY = event.touches[0].clientY
     }
     this.setState({
       originX: deltaX,
@@ -197,47 +197,47 @@ class Dragger extends React.Component {
       lastX: this.state.x,
       lastY: this.state.y,
       dragging: true,
-      mouseInTarget: event.clientY - event.target.getBoundingClientRect().top
-    });
-  };
+      mouseInTarget: event.clientY - event.target.getBoundingClientRect().top,
+    })
+  }
 
   setLastXandLastY = (x, y, originX, originY) => {
     this.setState({
       lastX: x,
       lastY: y,
-      originY
-    });
-  };
+      originY,
+    })
+  }
 
-  onDragEnd = event => {
+  onDragEnd = (event) => {
     /** 取消用户选择限制，用户可以重新选择 */
-    doc.body.style.userSelect = '';
+    doc.body.style.userSelect = ''
 
-    this.self = null;
-    doc.removeEventListener('mousemove', this.move);
-    doc.removeEventListener('mouseup', this.onDragEnd);
+    this.self = null
+    doc.removeEventListener('mousemove', this.move)
+    doc.removeEventListener('mouseup', this.onDragEnd)
 
-    doc.removeEventListener('touchmove', this.move);
-    doc.removeEventListener('touchend', this.onDragEnd);
+    doc.removeEventListener('touchmove', this.move)
+    doc.removeEventListener('touchend', this.onDragEnd)
 
-    this.props.onDragging(this.props.x, this.props.y);
+    this.props.onDragging(this.props.x, this.props.y)
     this.setState(
       {
-        dragging: false
+        dragging: false,
       },
       () => {
-        if (this.props.onDragEnd) this.props.onDragEnd(event);
+        if (this.props.onDragEnd) this.props.onDragEnd(event)
       }
-    );
-  };
+    )
+  }
 
   componentDidUpdate() {
     if (this.props.controlled) {
       if (this.props.x !== this.state.x || this.props.y !== this.state.y) {
         this.setState({
           x: this.props.x,
-          y: this.props.y
-        });
+          y: this.props.y,
+        })
       }
     }
   }
@@ -251,23 +251,23 @@ class Dragger extends React.Component {
     if (typeof this.props.x === 'number' && typeof this.props.y === 'number') {
       this.setState({
         x: this.props.x,
-        y: this.props.y
-      });
+        y: this.props.y,
+      })
     }
   }
 
   render() {
-    const { x, y } = this.state;
-    const { className, children, controlled } = this.props;
+    const { x, y } = this.state
+    const { className, children, controlled } = this.props
 
-    let X = 0;
-    let Y = 0;
+    let X = 0
+    let Y = 0
     if (controlled) {
-      X = this.props.x;
-      Y = this.props.y;
+      X = this.props.x
+      Y = this.props.y
     } else {
-      X = x;
-      Y = y;
+      X = x
+      Y = y
     }
     // const X = this.props.x === void 666 ? x : this.props.x;
     // const Y = this.props.y === void 666 ? y : this.props.y;
@@ -282,20 +282,20 @@ class Dragger extends React.Component {
         onMouseDown: this.onDragStart,
         onMouseUp: this.onDragEnd,
         onTouchStart: this.onDragStart,
-        onTouchEnd: this.onDragEnd
-      };
-    };
+        onTouchEnd: this.onDragEnd,
+      }
+    }
     const providedStyle = {
       touchAction: 'none!important',
-      transform: `translate3d(${X}px,${Y}px,0)`
-    };
+      transform: `translate3d(${X}px,${Y}px,0)`,
+    }
     const bound = {
       instance: this.getParent,
       /**
        * 边框依赖 position 属性
        */
-      style: { position: 'absolute' }
-    };
+      style: { position: 'absolute' },
+    }
 
     return children({
       style: providedStyle,
@@ -304,8 +304,8 @@ class Dragger extends React.Component {
       y: Y,
       bound: bound,
       static: this.props.static,
-      dragging: this.state.dragging
-    });
+      dragging: this.state.dragging,
+    })
   }
 }
 
@@ -356,7 +356,7 @@ Dragger.propTypes = {
   /**
    * 受控函数
    */
-  onDragging: PropTypes.func
-};
+  onDragging: PropTypes.func,
+}
 
-export default Dragger;
+export default Dragger
